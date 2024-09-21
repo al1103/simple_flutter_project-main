@@ -87,7 +87,7 @@ class _MyHomePageState extends State<MyHomePage> {
       final response = await http.get(url).timeout(const Duration(seconds: 10));
       if (response.statusCode == 200) {
         setState(() {
-          responseMessage = 'Chào mừng bạn đến với ứng dụng web động';
+          responseMessage = 'Máy chủ đang hoạt động';
         });
       } else {
         setState(() {
@@ -122,6 +122,33 @@ class _MyHomePageState extends State<MyHomePage> {
     }
   }
 
+  Future<void> dateOfBirth(String date) async {
+    final url = Uri.parse('http://localhost:8080/api/v1/dateofbirth');
+    try {
+      final response = await http
+          .post(
+            url,
+            headers: {'Content-Type': 'application/json'},
+            body: json.encode({'date': date}),
+          )
+          .timeout(const Duration(seconds: 10));
+      if (response.statusCode == 200) {
+        final data = json.decode(response.body);
+        setState(() {
+          responseMessage = ' ${data['message']}';
+        });
+      } else {
+        setState(() {
+          responseMessage = 'Máy chủ không phản hồi đúng';
+        });
+      }
+    } catch (e) {
+      setState(() {
+        responseMessage = 'Không thể kết nối đến máy chủ: ${e.toString()}';
+      });
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -132,12 +159,13 @@ class _MyHomePageState extends State<MyHomePage> {
           children: [
             TextField(
               controller: controller,
-              decoration: const InputDecoration(labelText: 'Tên'),
+              decoration:
+                  const InputDecoration(labelText: 'Nhập tên hoặc ngày sinh'),
             ),
             const SizedBox(height: 20),
             FilledButton(
               onPressed: sendName,
-              child: const Text('Gửi'),
+              child: const Text('Gửi tên'),
             ),
             const SizedBox(height: 10),
             FilledButton(
@@ -148,6 +176,11 @@ class _MyHomePageState extends State<MyHomePage> {
             FilledButton(
               onPressed: () => echoMessage(controller.text),
               child: const Text('Gửi echo'),
+            ),
+            const SizedBox(height: 10),
+            FilledButton(
+              onPressed: () => dateOfBirth(controller.text),
+              child: const Text('Gửi ngày sinh'),
             ),
             const SizedBox(height: 20),
             Text(

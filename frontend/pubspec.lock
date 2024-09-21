@@ -41,6 +41,14 @@ packages:
       url: "https://pub.dev"
     source: hosted
     version: "1.18.0"
+  datetime_setting:
+    dependency: "direct main"
+    description:
+      name: datetime_setting
+      sha256: acbeb9e3fce56d497d445153e18b12b4b33d80c2a69f5fa58b7b1ef741632a0b
+      url: "https://pub.dev"
+    source: hosted
+    version: "2.0.3"
   fake_async:
     dependency: transitive
     description:

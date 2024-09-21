@@ -10,7 +10,8 @@ final _router = Router(notFoundHandler: _notFoundHandler)
   ..get('/', _rootHandler)
   ..get('/api/v1/check', _checkHandler)
   ..get('/api/v1/echo/<message>', _echoHandler)
-  ..post('/api/v1/submit', _submitHandler);
+  ..post('/api/v1/submit', _submitHandler)
+  ..post('/api/v1/dateofbirth', _dateOfBirthHandler);
 
 /// Header mặc định cho dữ liệu trả về dưới dạng JSON
 final _headers = {'Content-Type': 'application/json'};
@@ -41,6 +42,52 @@ Response _checkHandler(Request req) {
     json.encode({'message': 'Chào mừng bạn đến với ứng dụng web động'}),
     headers: _headers,
   );
+}
+
+Future<Response> _dateOfBirthHandler(Request req) async {
+  try {
+    final payload = await req.readAsString();
+
+    final data = json.decode(payload);
+
+    final date = data['date'] as String?;
+
+
+    if (date != null && date.isNotEmpty) {
+      final parsedDate = DateTime.parse(date);
+      final timeDifference = DateTime.now().difference(parsedDate);
+
+      final yearsPassed = timeDifference.inDays ~/ 365;
+
+      final response = {
+        'message': 'Bạn đã sống được $yearsPassed năm.',
+      };
+
+      return Response.ok(
+        json.encode(response),
+        headers: _headers,
+      );
+    } else {
+      final response = {
+        'message': 'Ngày sinh không hợp lệ hoặc chưa được cung cấp.'
+      };
+
+
+      return Response.badRequest(
+        body: json.encode(response),
+        headers: _headers,
+      );
+    }
+  } catch (e) {
+    // Xử lý ngoại lệ khi giải mã JSON hoặc xử lý ngày
+    final response = {'message': 'Yêu cầu không hợp lệ. Lỗi: ${e.toString()}.'};
+
+    // Trả về phản hồi với statusCode 400 và nội dung JSON
+    return Response.badRequest(
+      body: json.encode(response),
+      headers: _headers,
+    );
+  }
 }
 
 Response _echoHandler(Request request) {
